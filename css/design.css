@@ -89,11 +89,6 @@ body{
         color: #999;
       }
 
-  .student-item:last-child{
-    margin: 0;
-    padding: 0;
-    border-bottom: none;
-  }
 
 .pagination{
   margin: 40px 0 0 0;

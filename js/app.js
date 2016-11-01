@@ -7,41 +7,54 @@
 //Starting with variables
 	var studentPerPage = 10;
 	var studentlist = $(".student-item");
-	var listLength = studentlist.length;
-	var numberofpages = Math.ceil(listLength / studentPerPage);
-	var search = [];
+	var numberofpages;
+	var students = [];
 	var pageActive = 1;
 
-//starting with the beginning
-refresh(0);
+//Start the pagination	
+	start();
 
-//This function is used to refresh the pagination and filtering
-	function refresh(studentNumber) {
-		studentlist = $(".student-item");
-		listLength = studentlist.length;
-		numberofpages = Math.ceil(listLength / studentPerPage);
-		search = [];
-		showStudents(studentNumber);
-		appendPagination(numberofpages, pageActive);
+//Global functions 
+	function start() {
 		createHeader();
+		refresh(1,0);
+	}
+
+	function refresh(page, student) {
+		pageActive = page;
+		studentlist = $(".student-item");
+		createStudentList();
+		showStudents(student);
+		appendPagination(page);
 	}
 
 
-
-//Create elements
-
-	//Create the pagination
-		function createPagination (pagenumber, active) {
-			var ul = $("<ul></ul>");
-			var listItem = $("<li></li>");
-			var anchor = $('<a href="#">'+ pagenumber + '</a>');
-			if (pagenumber===active) {
-				anchor.addClass("active");
+//Basic function	
+	//Show a specific number of students, "studentPerPage"
+		function showStudents(parameter) {
+			studentlist.hide();
+			$(".student-list .error").remove();
+			for (var i = 0; i <studentPerPage; i+= 1) {				
+					studentlist.eq(students[i + parameter]).show();				
 			}
-			listItem.append(anchor);
-			return listItem; 
-	}
-
+		}
+	
+	
+//Create elements
+	//Create the list of students into the variable "students"
+		function createStudentList() {
+			var searchbox = $(".student-header input").val().toUpperCase();
+			
+			students = [];
+			
+			for (var i=0; i<studentlist.length; i+=1) {
+				if (studentlist.eq(i).children("div").children("h3").text().toUpperCase().indexOf(searchbox) > -1 || studentlist.eq(i).children("div").children(".email").text().toUpperCase().indexOf(searchbox) > -1) {
+					students.push(i);	
+				}
+			}
+			numberofpages  = Math.ceil(students.length / studentPerPage)
+		}
+		
 	//Create the header, with the search input, and the buttons
 		function createHeader () {
 			var div = $(".student-header");
@@ -54,6 +67,29 @@ refresh(0);
 			$(div).append(searchbutton);
 			$(div).append(clearbutton);
 			$(div).append(morebutton);
+		}
+		
+	//Create the pagination
+		function createPagination (pagenumber, active) {
+			var ul = $("<ul></ul>");
+			var listItem = $("<li></li>");
+			var anchor = $('<a href="#">'+ pagenumber + '</a>');
+			if (pagenumber===active) {
+				anchor.addClass("active");
+			}
+			listItem.append(anchor);
+			return listItem; 
+		}
+		
+	//Append the pagination to the DOM
+		function appendPagination (active) {
+			var pagination = $("#pagination");
+			pagination.children().remove();
+			if (numberofpages >1) {
+				for (var i = 1; i <= numberofpages; i +=1) {
+					pagination.append(createPagination(i, active));
+				}	
+			}
 		}
 		
 	//Create a new student
@@ -74,84 +110,33 @@ refresh(0);
 			$(listItem).append(divjoin);
 			
 			$(".student-list").append(listItem);
-
-			refresh((pageActive - 1 ) * studentPerPage);
+			refresh(pageActive, (pageActive-1)*studentPerPage);
 		}
 
-		
-	//Append the pagination to the DOM
-		function appendPagination (totalpages, active) {
-			var pagination = $("#pagination");
-			pagination.children().remove();
-			if (totalpages >1) {
-				for (var i = 1; i <= totalpages; i +=1) {
-					pagination.append(createPagination(i, active));
-				}	
-			}
-		}
-		
-
 
 		
-//Other function
-		
-	//Show a specific number of students, "studentPerPage"
-		function showStudents(parameter) {
-			studentlist.hide();
-			$(".student-list .error").remove();
-			for (var i = 0; i <studentPerPage; i+= 1) {
-				if (search.length > 0) {
-					studentlist.eq(search[i + parameter]).show();
-				} else {
-					studentlist.eq(parameter + i).show();
-				}
-			}
-		}
-	
-	
+//Other function		
 	//Change the number of students to display onto the page
 		function change () {
 			var change = parseInt(prompt("Set the new number of student you want to display on each pages :"));
 			studentPerPage = change;
-			numberofpages = Math.ceil(listLength / change);
-			showStudents(0);
-			appendPagination(numberofpages, 1);
-		}
-		
+			refresh(1,0);
+			}		
 
 	//The search method
 		function searchMethod () {
-			var pagination = $("#pagination li");
-			var searchbox = $(".student-header input").val().toUpperCase();
-			search = [];
-
-			for (var i=0; i<studentlist.length; i+=1) {
-				if (studentlist.eq(i).children("div").children("h3").text().toUpperCase().indexOf(searchbox) > -1 || studentlist.eq(i).children("div").children(".email").text().toUpperCase().indexOf(searchbox) > -1) {
-					search.push(i);	
-				}
-			}
-			
-			if (search.length >0) {
-				listLength = search.length;
-				numberofpages = Math.ceil(listLength / studentPerPage),
-				appendPagination(numberofpages,1);
-				showStudents(0);				
-			} else {
-				var message = $('<h2 class="error">Sorry, no student matches your search.</h2>');
-				studentlist.hide();
+			var message = $('<h2 class="error">Sorry, no student matches your search.</h2>');
+			refresh(1,0);			
+			if (students.length <=0) {
 				$(".student-list .error").remove();
 				$(".student-list").append(message);
-				appendPagination(0,1);
 			}
 
 		}
 		
 
-
-
 		
-//Set the onClick method
-	
+//Set the "onclick" method	
 	//Set the click to the pagination, to navigate between each pages
 		$("#pagination").on("click", "a", function(){
 			var pageValue = parseInt($(this).text());
@@ -170,8 +155,9 @@ refresh(0);
 	
 	//Set the click to the 'clear' button, to start over the whole pagination
 		$(".student-header").on("click", "#clearbutton", function () {
+			$(".student-header input").val("");
 			pageActive = 1;
-			refresh(0);
+			start()
 		});
 
 	//Set the click to the 'more' button, to manage the user to add students, by typing 'add', and to change the number of students on each pages by typing 'change'
@@ -194,8 +180,6 @@ refresh(0);
 		})
 		
 	
-
 	
 //Stick the page header to the top
 		$(".page-header").sticky({topSpacing:0})
-	
