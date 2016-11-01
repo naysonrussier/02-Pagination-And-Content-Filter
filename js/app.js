@@ -52,7 +52,7 @@
 					students.push(i);	
 				}
 			}
-			numberofpages  = Math.ceil(students.length / studentPerPage)
+			numberofpages  = Math.ceil(students.length / studentPerPage);
 		}
 		
 	//Create the header, with the search input, and the buttons
@@ -157,13 +157,13 @@
 		$(".student-header").on("click", "#clearbutton", function () {
 			$(".student-header input").val("");
 			pageActive = 1;
-			start()
+			start();
 		});
 
 	//Set the click to the 'more' button, to manage the user to add students, by typing 'add', and to change the number of students on each pages by typing 'change'
 		$(".student-header").on("click", "#more", function () {
-			do {
 			var quit = false;
+			do {
 			var asking = prompt("What do you want to do? You can type 'change' to change the number of students on each pages, or you can type 'add' to add a new student. To quit, you can type 'quit'.").toUpperCase();
 			if (asking == "CHANGE") {
 				change();
@@ -177,9 +177,9 @@
 				alert("You didn't enter the right parameter. Try again.");
 			}
 			} while (!quit);
-		})
+		});
 		
 	
 	
 //Stick the page header to the top
-		$(".page-header").sticky({topSpacing:0})
+		$(".page-header").sticky({topSpacing:0});
