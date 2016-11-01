@@ -71,7 +71,6 @@
 		
 	//Create the pagination
 		function createPagination (pagenumber, active) {
-			var ul = $("<ul></ul>");
 			var listItem = $("<li></li>");
 			var anchor = $('<a href="#">'+ pagenumber + '</a>');
 			if (pagenumber===active) {
